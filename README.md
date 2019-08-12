@@ -2,7 +2,7 @@
 Metropolitan Area Mapping Tool: A shinyApp that allows user to upload a metro area -level or county -level .csv dataset and instantaneously generate a customizable chloropleth map.
 
 
-### metro_mapper.R
+### shiny_metro.R
 runs the app (server and UI). 
 
 ### report.Rmd
