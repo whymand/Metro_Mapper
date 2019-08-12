@@ -1,0 +1,214 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+```
+
+
+
+1) Copy and paste all content below instructions into empty Rmarkdown document (set to html output)
+2) Download and unzip shapefiles into a folder named "cbsa" contained in the same folder as the Rmarkdown document
+3) Ensure all listed packages are installed
+
+NOTE: This code does NOT include Hawaii & Alaska
+ 
+
+
+```{r}
+cat("```{r}")
+```
+
+
+knitr::opts_chunk$set(echo = FALSE, comment = NA)
+
+
+```{r}
+cat("```","\n")
+```
+
+
+
+
+```{r}
+cat("```{r}")
+```
+
+library(RColorBrewer)
+
+library(plotly)
+
+library(shiny)
+
+library(colourpicker)
+
+library(sf)
+
+library(readr)
+
+library(leaflet)
+
+library(tmap)
+
+library(rmapshaper)
+
+library(tidyverse)
+
+library(tigris)
+
+library(grid)
+
+
+```{r}
+cat("```","\n")
+```
+
+```{r}
+cat("```{r}")
+```
+
+HI_AK <- c(`r cat('"46520"')`,`r cat('"25900"')`,`r cat('"28180"')`,`r cat('"27980"')`,`r cat('"11260"')`,`r cat('"21820"')`,`r cat('"27940"')`,`r cat('"28540"')`,`r cat('"28980"')`) 
+
+cbsa <- read_sf(`r cat('"cbsa"')`) %>%
+  filter(!(geoid %in% HI_AK)) %>%
+  dplyr::select(name, everything()) %>%
+  ms_simplify()
+  
+cbsa50<-read_sf(`r cat('"msas_xsimp"')`) %>%
+  dplyr::select(geoid = GEOID,
+         name = NAME,
+         geometry = geometry) 
+
+cbsa50$geoid 
+<- as.character(cbsa50$geoid)
+
+natbo<-read_sf(`r cat('"states"')`) %>%
+     filter(STATE_FIPS != `r cat('"02"')`) %>%
+     filter(STATE_FIPS != `r cat('"15"')`) %>%  
+     ms_simplify()
+
+borders50<-tm_shape(cbsa50, projection = 2163) + tm_borders() + tm_layout(frame = FALSE)
+
+usborders<-tm_shape(natbo, projection = 2163) + tm_borders() + tm_layout(frame = FALSE)
+
+input_data <- read_csv(`r input$file1$name`, col_types = cols(cbsa_code = col_character()))
+
+
+full_data<-inner_join(cbsa,input_data, by = c("geoid" = "cbsa_code")
+
+```{r}
+
+cat("```","\n")
+
+
+cat("```{r}")
+
+```
+
+the_map <- usborders + 
+
+tm_shape(full_data, projection = 2163) + 
+
+```{r}  
+if (input$bubbs == "low"){
+              cat("tm_bubbles(",input$var, ",")
+} else { cat("tm_polygons(",input$var,"),")}
+if (input$bubbs == "low"){cat("size =", input$var2)}              
+```
+
+```{r}  
+if (input$scale == TRUE){
+              cat("breaks = ", as.numeric(unlist(strsplit(input$breaks,","))), ",")
+} else { cat("style =", input$style,",")}
+              
+```
+              palette = c(`r input$low`, `r input$high`),
+              popup.vars=c(`r input$var`, "name"),
+              popup.format = list(text.align = "left", format = "f", digits = 3) +
+
+
+tm_layout(
+          legend.position = c(`r cat('"LEFT"')`,`r cat('"BOTTOM"')`),
+          legend.outside = FALSE,
+          legend.text.size = 2.25,
+          legend.title.size = .0001,
+          title.position = c(`r cat('"LEFT"')`,`r cat('"BOTTOM"')`),
+          title = input$legen,
+          title.size = 2.5,
+          fontfamily = `r cat('"Interstate"')`) 
+
+```{r}
+
+cat("```")
+
+cat(
+"<style type='text/css'>", "\n",
+" h3{", "\n",
+" font-size: 16px;", "\n",
+" font-family: 'Interstate';", "\n",
+"color:#C0C0C0;", "\n",
+" margin: 0.5em auto;", "\n",
+"}", "\n",
+"h4 {", "\n",
+"  font-size: 20px;", "\n",
+"  font-weight: bold;", "\n",
+"  font-family: 'Interstate';", "\n",
+"color:#000000;", "\n",
+"  margin: 0.4em auto;", "\n",
+"}", "\n",
+"h5 {", "\n",
+"  font-size: 2px;", "\n",
+"  font-family: 'Interstate';", "\n",
+"  margin: 0.01em auto;", "\n",
+"}", "\n",
+"h6 {", "\n",
+"  font-size: 19px;", "\n",
+"  font-family: 'Interstate';", "\n",
+"  color:#000000;", "\n",
+"  margin: 0.01em auto;", "\n",
+"}", "\n",
+"hr {" , "\n",
+"    margin: 0px;", "\n",
+"    border-width: 1.5px;", "\n",
+"    border-color: #C0C0C0;", "\n",
+"}", "\n",
+"</style>"
+)
+
+```
+
+```{r}
+
+
+cat("<h3> MAP 1 <h3>","\n",
+"<font size = '2'> <hr> </font>","\n",
+"<h4>", input$title, "<h4>","\n",
+"<h6>",input$subtitle, "<h6>","\n")
+
+
+
+cat("```{r}")
+
+```
+
+the_map
+
+```{r}
+cat("```")
+
+```
+
+
+```{r}
+cat(
+
+"<h5> <span style = 'color:#C0C0C0'> <font size = '2'>",input$notes," </font> </span>  <h5>", "\n",
+"<hr>", "\n",
+"<p><p/>", "\n",
+"<div style='position: fixed; right: 1;'> <span style = 'color:#878787'> <font size = '2'>",input$source," </font> </span> </div>", "<div style='position: fixed; right: 0;'>![](logo2.jpeg){width=450px} </div>"
+)
+
+
+```
+
